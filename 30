@@ -1,0 +1,24 @@
+@echo off
+
+ECHO Clean up files older than 30 days
+SET /P Location=Enter path, default is C:\cases
+SET /P Folders=Clean up empty folders? [Y/n]
+
+IF %Folders% =="" SET Folders="y"
+IF "%Location%" =="" SET Location="C:\cases"
+
+:CHECKFOLDER
+IF EXIST %Location% GOTO :FILES
+ECHO Location is invalid
+GOTO :EOF
+
+:FILES
+forfiles /p "%Location%" /s /d -30 /c "cmd /c del @path /f/s/q" > "%Location%"\rm.log
+ECHO Cleaned up successfully
+IF %Folders% =="y" (GOTO :FOLDERS)
+GOTO :EOF
+
+:FOLDERS
+for /f "tokens=*" %%d in ('dir "%Location%" /ad/b/s ^| sort /R') do rd "%%d"
+ECHO Empty folders removed
+GOTO :EOF
